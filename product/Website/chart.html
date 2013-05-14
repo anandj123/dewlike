@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="chart.css">
+    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"></script> 
+    <script type="text/javascript" src="jquery.tipsy.js"></script>
+    <link href="tipsy.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+	<div class="left">
+		<input type="submit" onClick="Javascript:loadData()" value="Animate"></input>
+	</div>
+    <div id="viz"></div>
+    
+    <script type="text/javascript">
+    
+    	function loadData()
+    	{
+    		//-----------------------------------------------------------------------
+    		// 	Send a http request with AJAX http://api.jquery.com/jQuery.ajax/
+    		//-----------------------------------------------------------------------
+    		$.ajax({                                      
+      			url: 'test.php',   		  //the script to call to get data          
+      			data: "",         		  //you can insert url argumnets here to pass to api.php
+                                  		  //for example "id=5&parent=6"
+      			dataType: 'json', 		  //data format 
+      			async: false,
+      			type: "POST",     
+      			success: function(msg)   //on recieve of reply
+      			{
+        			spaceCircles = msg;  //set the data for visualization
+        			redraw();
+      			} 
+    		});
+    	}
+    	
+    	var screenHeight = 430, screenWidth = 800, padding = 30;
+		var toggle = true;
+		var spaceCircles = [{}];
+		var color = d3.scale.category10();
+		
+		var svgContainer = d3.select("#viz")
+			.append("svg")
+			.attr("height", screenHeight)
+			.attr("width", screenWidth);
+		
+		loadData();
+        
+ 		var circles = svgContainer.selectAll("circle")
+                           .data(spaceCircles)
+                           .enter()
+                           .append("circle");
+                           
+        var xMin = d3.min($.map(spaceCircles, function (a) {return a.x;} )); 
+        var xMax = d3.max($.map(spaceCircles, function(a) {return a.x;}));
+	 	var scaleScreenX = d3.scale.linear()
+				.domain([0, xMax])
+				.range([padding, screenWidth-padding]);
+		
+		var yMin = d3.min($.map(spaceCircles, function(a) {return a.y;}));
+		var yMax = d3.max($.map(spaceCircles, function(a) {return a.y;}));		
+		var	scaleScreenY = d3.scale.linear()
+				.domain([yMax, 0])
+				.range([padding,screenHeight-padding]);
+				
+		var rMin = d3.min($.map(spaceCircles, function(a) {return a.r;}));
+		var rMax = d3.max($.map(spaceCircles, function(a) {return a.r;}));				
+		var scaleScreenR = d3.scale.linear()
+				.domain([0,100])
+				.range([0,20]);
+
+		svgContainer.append("g")
+			.attr("class", "x axis")
+			.attr("transform", "translate(0,400)")
+    		.call(d3.svg.axis()
+    				.scale(scaleScreenX)
+            		.orient("bottom"));
+            
+        svgContainer.append("g")
+            .attr("transform", "translate(30,0)")
+    		.attr("class", "y axis")
+    		.call(d3.svg.axis()
+            		.scale(scaleScreenY)
+            		.orient("left"));
+            
+		/*                           
+		var circleAttributes = circles
+            .attr("cx", function (d) { return scaleScreenX(d.x); })
+            .attr("cy", function (d) { return scaleScreenY(d.y); })
+            .attr("r", function(d){ return scaleScreenR(d.r);} )
+            .attr("fill", function(d, i) {return color(i);})
+            .on("mouseover", function(d)
+        			{
+        				d3.select(this).attr("r", 50);
+        			})
+        	.on("mouseout", function(d){d3.select(this).attr("r", scaleScreenR(d.r));});
+        */
+        var circleAttributes = circles
+            .attr("cx", function (d) { return scaleScreenX(d.x); })
+            .attr("cy", function (d) { return scaleScreenY(d.y); })
+            .attr("r", function(d){ return scaleScreenR(d.r);} )
+            .attr("fill", function(d, i) {return color(i);});
+        $('svg circle').tipsy({ 
+        		gravity: 'w', 
+        		html: true, 
+        		title: function() 
+        		{
+          			var d = this.__data__;
+          			/*return '<div style="float: left">' + 'x value ' + '</div>' + '<div style="float: right">' + d.x + '</div>' + '<br>' 
+          					+ '<div style="float: left">' + 'y value ' + '</div>' + '<div style="float: right">' + d.y + '</div>' + '<br>' 
+          					+ '<div style="float: left">' + 'text ' + '</div>' + '<div style="float: right">' + d.text + '</div>'; */
+          			return '<table>' + '<th>' + 'Data values' +'</th>' +
+          					'<tr>' + '<td>' +'x value' + '</td>' + '<td>' + d.x  + '</td>' +'</tr>' +
+          					'<tr>' + '<td>' +'y value' + '</td>' + '<td>' + d.y  + '</td>' +'</tr>' +
+          					'<tr>' + '<td>' +'text' + '</td>' + '<td>' + d.text  + '</td>' +'</tr>' + '</table>' ;		
+        		}
+      		});
+      		
+        function redraw() {
+			var circles = svgContainer.selectAll("circle")
+							   .data(spaceCircles)
+							   .transition()
+							   .duration(1000)
+							   .delay(10)
+							   .ease("quad");
+							   			
+			var xMin = d3.min($.map(spaceCircles, function (a) {return a.x;} )); 
+			var xMax = d3.max($.map(spaceCircles, function(a) {return a.x;}));
+			var scaleScreenX = d3.scale.linear()
+					.domain([0, xMax])
+					.range([padding, screenWidth-padding]);
+			
+			var yMin = d3.min($.map(spaceCircles, function(a) {return a.y;}));
+			var yMax = d3.max($.map(spaceCircles, function(a) {return a.y;}));		
+			var scaleScreenY = d3.scale.linear()
+					.domain([yMax, 0])
+					.range([padding,screenHeight-padding]);
+					
+			var rMin = d3.min($.map(spaceCircles, function(a) {return a.r;}));
+			var rMax = d3.max($.map(spaceCircles, function(a) {return a.r;}));				
+			var scaleScreenR = d3.scale.linear()
+					.domain([0,50])
+					.range([0,20]);
+			var color = d3.scale.category10();
+									   
+			var circleAttributes = circles
+				.attr("cx", function (d) { return scaleScreenX(d.x); })
+				.attr("cy", function (d) { return scaleScreenY(d.y); })
+				.attr("r", function(d){ return scaleScreenR(d.r);} )
+				.attr("fill", function(d, i) {return color(i);});
+		}    
+    
+    </script>
+</body>
+</html>

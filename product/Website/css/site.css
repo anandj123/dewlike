@@ -1,0 +1,89 @@
+body {
+	background:#fff;
+}
+
+h1{
+	font: 2em Georgia;
+	padding: 0px;
+	margin: 0px;
+	display: block;
+}
+
+h1 a{
+	margin: 0px;
+	padding: 0px;
+}
+
+.left {
+	float: "left";
+	display: inline;
+	width: 33%;
+}
+
+.right{
+	float: "right";
+	display:inline;
+	width: 66%;
+}
+.clear {
+	clear: both;
+}
+
+.logo{
+	width: 8%;
+	height: 60px;
+	padding: 0px 65px 4px 55px;
+}
+
+.nav{
+	display: inline;
+	font: 1em Georgia;
+	padding: 0px;
+	background: #f1f1f1;
+	width: 100%;
+	border-bottom: 3px solid black;
+	float: left;
+	margin-bottom: 2px;
+}
+.nav ul {
+	padding: 0px;
+	margin: 0px;
+}
+.nav ul li {
+	display: inline-block;
+	padding:15px 15px 10px 15px;
+	float: left;
+}
+.nav ul li a{
+	font: 1em Georgia;
+	list-style: none;
+	text-decoration: none;
+	margin: 2px;
+	color:black;
+}
+.nav ul li a:hover{
+	color: orange;
+}
+
+.nav ul li ul li {
+	clear: both;
+	margin: 0px;
+	padding: 0px;
+	padding: 15px 0px 15px 0px;
+}
+
+.nav ul li ul {
+	position: absolute;
+	margin: 0px;
+	display:none;
+	background:#f1f1f1;
+}
+
+.nav ul li:hover ul{
+	display:block;
+	z-index: 1;
+}
+
+ol li {
+	list-style: none;
+}
